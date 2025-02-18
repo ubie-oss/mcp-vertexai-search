@@ -67,3 +67,53 @@ publish:
 .PHONY: test-publish
 test-publish:
 	bash ./dev/publish.sh "testpypi"
+
+
+run-server:
+	uv run mcp-vertexai-search serve \
+		--project_id ubie-yu-sandbox \
+		--location us \
+		--datastore_id test-tech-docs_1739852696758
+
+build-docker:
+	docker build --rm -t mcp-vertexai-search:dev .
+
+.PHONY: run-docker-server
+run-docker-server:
+	docker run -it --rm \
+		-v "$(shell ${HOME}/.config/vertexai):/root/.config/vertexai" \
+		-p 8080:8080 mcp-vertexai-search:dev
+
+
+test-stdio-serve:
+	source .env && \
+		npx @modelcontextprotocol/inspector \
+			uv run mcp-vertexai-search serve \
+				--model_project_id $${MODEL_PROJECT_ID} \
+				--model_location $${MODEL_LOCATION} \
+				--datastore_project_id $${DATASTORE_PROJECT_ID} \
+				--datastore_location $${DATASTORE_LOCATION} \
+				--datastore_id $${DATASTORE_ID} \
+				--transport stdio
+
+test-sse-serve:
+	source .env && \
+		npx @modelcontextprotocol/inspector \
+			uv run mcp-vertexai-search serve \
+				--model_project_id $${MODEL_PROJECT_ID} \
+				--model_location $${MODEL_LOCATION} \
+				--datastore_project_id $${DATASTORE_PROJECT_ID} \
+				--datastore_location $${DATASTORE_LOCATION} \
+				--datastore_id $${DATASTORE_ID} \
+				--transport sse
+
+.PHONY: test-search
+test-search:
+	source .env && \
+		uv run mcp-vertexai-search search \
+			--model_project_id $${MODEL_PROJECT_ID} \
+			--model_location $${MODEL_LOCATION} \
+			--datastore_project_id $${DATASTORE_PROJECT_ID} \
+			--datastore_location $${DATASTORE_LOCATION} \
+			--datastore_id $${DATASTORE_ID} \
+			--query "What is the segments?"
