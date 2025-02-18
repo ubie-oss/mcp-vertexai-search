@@ -1,0 +1,26 @@
+name: Upgrade Trunk
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # Runs every Wednesday (in the UTC timezone)
+    - cron: 0 0 * * 3
+
+permissions: read-all
+
+jobs:
+  trunk_upgrade:
+    name: Upgrade Trunk
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # For trunk to create PRs
+      pull-requests: write # For trunk to create PRs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      # >>> Install your own deps here (npm install, etc) <<<
+      # SEE https://github.com/trunk-io/trunk-action
+      - name: Trunk Upgrade
+        uses: trunk-io/trunk-action/upgrade@v1
+        with:
+          signoff: true
