@@ -34,17 +34,22 @@ uv sync --all-extras
 This supports two transports for SSE (Server-Sent Events) and stdio (Standard Input Output).
 We can control the transport by setting the `--transport` flag.
 
+We can configure the MCP server with a YAML file.
+[config.yml.template](./config.yml.template) is a template for the config file.
+Please modify the config file to fit your needs.
+
 ```bash
 uv run mcp-vertexai-search serve \
-    --model_project <your-gemini-project-id> \
-    --model_location <your-gemini-location> \
-    --datastore_project <your-datastore-project-id> \
-    --datastore_location <your-datastore-location> \
-    --datastore_id <your-datastore-id> \
+    --config config.yml \
     --transport <stdio|sse>
 ```
 
-## Roadmap
+### Test the Vertex AI Search
 
-- [ ] Config file to tune the MCP server
-- [ ] Multiple Vertex AI data stores
+We can test the Vertex AI Search by using the `mcp-vertexai-search search` command without the MCP server.
+
+```bash
+uv run mcp-vertexai-search search \
+    --config config.yml \
+    --query <your-query>
+```

@@ -6,18 +6,19 @@ import vertexai
 from mcp_vertexai_search.agent import (
     VertexAISearchAgent,
     create_model,
-    create_vertexai_search_tool,
-    get_default_generation_config,
+    create_vertex_ai_tools,
     get_default_safety_settings,
+    get_generation_config,
     get_system_instruction,
 )
+from mcp_vertexai_search.config import load_yaml_config
 from mcp_vertexai_search.server import create_server, run_sse_server, run_stdio_server
 
 cli = click.Group()
 
 
-# bandit: ignore=B104
 @cli.command("serve")
+# trunk-ignore(bandit/B104)
 @click.option("--host", type=str, default="0.0.0.0", help="The host to listen on")
 @click.option("--port", type=int, default=8080, help="The port to listen on")
 @click.option(
@@ -26,37 +27,27 @@ cli = click.Group()
     default="stdio",
     help="The transport to use",
 )
-@click.option("--model_project_id", type=str, help="The project ID")
-@click.option("--model_location", type=str, help="The location")
-@click.option("--model_name", type=str, help="The model name", default="models/gemini-1.5-flash-002")
-@click.option("--datastore_project_id", type=str, help="The datastore project ID")
-@click.option("--datastore_location", type=str, help="The datastore location")
-@click.option("--datastore_id", type=str, help="The datastore ID")
+@click.option("--config", type=click.Path(exists=True), help="The config file")
 def serve(
     host: str,
     port: int,
     transport: str,
-    model_project_id: str,
-    model_location: str,
-    model_name: str,
-    datastore_project_id: str,
-    datastore_location: str,
-    datastore_id: str,
+    config: str,
 ):
-    vertexai.init(project=model_project_id, location=model_location)
-
-    search_tool = create_vertexai_search_tool(
-        project_id=datastore_project_id,
-        location=datastore_location,
-        datastore_id=datastore_id,
+    server_config = load_yaml_config(config)
+    vertexai.init(
+        project=server_config.model.project_id, location=server_config.model.location
     )
+
+    search_tools = create_vertex_ai_tools(server_config.data_stores)
     model = create_model(
-        model_name=model_name,
-        tools=[search_tool],
+        model_name=server_config.model.model_name,
+        tools=search_tools,
         system_instruction=get_system_instruction(),
     )
     agent = VertexAISearchAgent(model=model)
-    app = create_server(agent)
+
+    app = create_server(agent, server_config)
     if transport == "stdio":
         asyncio.run(run_stdio_server(app))
     elif transport == "sse":
@@ -66,37 +57,33 @@ def serve(
 
 
 @cli.command("search")
-@click.option("--model_project_id", type=str, help="The project ID")
-@click.option("--model_location", type=str, help="The location")
-@click.option("--model_name", type=str, help="The model name", required=False, default="models/gemini-1.5-flash-002")
-@click.option("--datastore_project_id", type=str, help="The datastore project ID")
-@click.option("--datastore_location", type=str, help="The datastore location")
-@click.option("--datastore_id", type=str, help="The datastore ID")
+@click.option("--config", type=click.Path(exists=True), help="The config file")
 @click.option("--query", type=str, help="The query to search for")
 def search(
-    model_project_id: str,
-    model_location: str,
-    model_name: str,
-    datastore_project_id: str,
-    datastore_location: str,
-    datastore_id: str,
+    config: str,
     query: str,
 ):
-    vertexai.init(project=model_project_id, location=model_location)
-    search_tool = create_vertexai_search_tool(
-        project_id=datastore_project_id,
-        location=datastore_location,
-        datastore_id=datastore_id,
+    # Load the config
+    server_config = load_yaml_config(config)
+
+    # Initialize the Vertex AI client
+    vertexai.init(
+        project=server_config.model.project_id, location=server_config.model.location
     )
+
+    # Create the search agent
+    search_tools = create_vertex_ai_tools(server_config.data_stores)
     model = create_model(
-        model_name=model_name,
-        tools=[search_tool],
+        model_name=server_config.model.model_name,
+        tools=search_tools,
         system_instruction=get_system_instruction(),
     )
     agent = VertexAISearchAgent(
         model=model,
     )
-    generation_config = get_default_generation_config()
+
+    # Generate the response
+    generation_config = get_generation_config()
     safety_settings = get_default_safety_settings()
     response = agent.search(
         query,

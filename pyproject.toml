@@ -8,7 +8,7 @@ packages = ["src/mcp_vertexai_search"]
 [project]
 name = "mcp-vertexai-search"
 version = "0.1.0"
-authors = [{ name = "yu-iskw" }]
+authors = [{ name = "ubie" }]
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10.0"
