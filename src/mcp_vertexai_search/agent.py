@@ -116,7 +116,7 @@ def get_system_instruction() -> str:
         - For supporting references, you can provide the Grounding tool snippets verbatim, and any other info like page number.
         - If information is not available in the tool, mention you don't have access to the information and do not try to make up an answer.
         - Output "answer" should be "I don't know" when the user question is irrelevant or outside the scope of the knowledge base.
-        - Leave "reference_snippet" as null if you are unsure about the page and text snippet or if no relevant snippet is found.
+        - Leave "references" as an empty list if you are unsure about the page and text snippet or if no relevant snippet is found.
 
         The Grounding tool finds the most relevant snippets from the Alphabet earning reports data store.
         Use the information provided by the tool as your knowledge base.
@@ -124,8 +124,7 @@ def get_system_instruction() -> str:
         - ONLY use information available from the Grounding tool.
         - DO NOT make up information or invent details not present in the retrieved snippets.
 
-        - Response should ALWAYS be in the following JSON format with "answer" and "reference_snippet" as keys, e.g., {"answer": "...", "reference_snippet": "..."}
-
+        Response should ALWAYS be in the following JSON format:
         ## JSON schema
         {SearchResponse.model_json_schema()}
         """
