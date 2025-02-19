@@ -1,25 +1,24 @@
 import textwrap
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
 from vertexai import generative_models
 
 from mcp_vertexai_search.config import DataStoreConfig
 
+# class Reference(BaseModel):
+#     """Reference"""
 
-class SearchResponse(BaseModel):
-    """Search response"""
+#     title: str = Field(..., description="Title of the reference snippet")
+#     raw_text: str = Field(..., description="Content of the reference raw text")
 
-    class Reference(BaseModel):
-        """Reference"""
 
-        title: str = Field(..., description="Title of the reference snippet")
-        raw_text: str = Field(..., description="Content of the reference raw text")
+# class SearchResponse(BaseModel):
+#     """Search response"""
 
-    answer: str = Field(..., description="The answer to the query")
-    references: List[Reference] = Field(
-        ..., description="References used to generate the answer"
-    )
+#     answer: str = Field(..., description="The answer to the query")
+#     references: List[Reference] = Field(
+#         ..., description="References used to generate the answer"
+#     )
 
 
 def get_generation_config(
@@ -116,7 +115,7 @@ def get_system_instruction() -> str:
         - For supporting references, you can provide the Grounding tool snippets verbatim, and any other info like page number.
         - If information is not available in the tool, mention you don't have access to the information and do not try to make up an answer.
         - Output "answer" should be "I don't know" when the user question is irrelevant or outside the scope of the knowledge base.
-        - Leave "reference_snippet" as null if you are unsure about the page and text snippet or if no relevant snippet is found.
+        - Leave "references" as an empty list if you are unsure about the page and text snippet or if no relevant snippet is found.
 
         The Grounding tool finds the most relevant snippets from the Alphabet earning reports data store.
         Use the information provided by the tool as your knowledge base.
@@ -124,10 +123,26 @@ def get_system_instruction() -> str:
         - ONLY use information available from the Grounding tool.
         - DO NOT make up information or invent details not present in the retrieved snippets.
 
-        - Response should ALWAYS be in the following JSON format with "answer" and "reference_snippet" as keys, e.g., {"answer": "...", "reference_snippet": "..."}
-
+        Response should ALWAYS be in the following JSON format:
         ## JSON schema
-        {SearchResponse.model_json_schema()}
+        {
+            "answer": {
+                "type": "string",
+                "description": "The answer to the user's query"
+            },
+            "references": [
+                {
+                    "title": {
+                        "type": "string",
+                        "description": "The title of the reference"
+                    },
+                    "raw_text": {
+                        "type": "string",
+                        "description": "The raw text in the reference"
+                    }
+                }
+            ]
+        }
         """
     ).strip()
 
