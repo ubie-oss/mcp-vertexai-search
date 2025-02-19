@@ -1,25 +1,24 @@
 import textwrap
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
 from vertexai import generative_models
 
 from mcp_vertexai_search.config import DataStoreConfig
 
+# class Reference(BaseModel):
+#     """Reference"""
 
-class SearchResponse(BaseModel):
-    """Search response"""
+#     title: str = Field(..., description="Title of the reference snippet")
+#     raw_text: str = Field(..., description="Content of the reference raw text")
 
-    class Reference(BaseModel):
-        """Reference"""
 
-        title: str = Field(..., description="Title of the reference snippet")
-        raw_text: str = Field(..., description="Content of the reference raw text")
+# class SearchResponse(BaseModel):
+#     """Search response"""
 
-    answer: str = Field(..., description="The answer to the query")
-    references: List[Reference] = Field(
-        ..., description="References used to generate the answer"
-    )
+#     answer: str = Field(..., description="The answer to the query")
+#     references: List[Reference] = Field(
+#         ..., description="References used to generate the answer"
+#     )
 
 
 def get_generation_config(
@@ -126,7 +125,24 @@ def get_system_instruction() -> str:
 
         Response should ALWAYS be in the following JSON format:
         ## JSON schema
-        {SearchResponse.model_json_schema()}
+        {
+            "answer": {
+                "type": "string",
+                "description": "The answer to the user's query"
+            },
+            "references": [
+                {
+                    "title": {
+                        "type": "string",
+                        "description": "The title of the reference"
+                    },
+                    "raw_text": {
+                        "type": "string",
+                        "description": "The raw text in the reference"
+                    }
+                }
+            ]
+        }
         """
     ).strip()
 
