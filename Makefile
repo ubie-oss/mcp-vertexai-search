@@ -72,34 +72,18 @@ run-docker-server:
 
 
 test-stdio-serve:
-	source .env && \
-		npx @modelcontextprotocol/inspector \
-			uv run mcp-vertexai-search serve \
-				--model_project_id $${MODEL_PROJECT_ID} \
-				--model_location $${MODEL_LOCATION} \
-				--datastore_project_id $${DATASTORE_PROJECT_ID} \
-				--datastore_location $${DATASTORE_LOCATION} \
-				--datastore_id $${DATASTORE_ID} \
-				--transport stdio
+	npx @modelcontextprotocol/inspector \
+		uv run mcp-vertexai-search serve \
+			--config config.yml \
+			--transport stdio
 
 test-sse-serve:
-	source .env && \
-		npx @modelcontextprotocol/inspector \
-			uv run mcp-vertexai-search serve \
-				--model_project_id $${MODEL_PROJECT_ID} \
-				--model_location $${MODEL_LOCATION} \
-				--datastore_project_id $${DATASTORE_PROJECT_ID} \
-				--datastore_location $${DATASTORE_LOCATION} \
-				--datastore_id $${DATASTORE_ID} \
-				--transport sse
+	uv run mcp-vertexai-search serve \
+		--config config.yml \
+		--transport sse
 
 .PHONY: test-search
 test-search:
-	source .env && \
-		uv run mcp-vertexai-search search \
-			--model_project_id $${MODEL_PROJECT_ID} \
-			--model_location $${MODEL_LOCATION} \
-			--datastore_project_id $${DATASTORE_PROJECT_ID} \
-			--datastore_location $${DATASTORE_LOCATION} \
-			--datastore_id $${DATASTORE_ID} \
-			--query "What is the segments?"
+	uv run mcp-vertexai-search search \
+		--config config.yml \
+		--query "What is the segments?"

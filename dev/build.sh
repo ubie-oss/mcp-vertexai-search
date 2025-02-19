@@ -1,3 +1,4 @@
+#!/bin/bash
 set -Eo pipefail
 
-python -m build
+uv build

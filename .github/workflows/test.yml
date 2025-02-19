@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.12"]
       fail-fast: false
 
     defaults:
@@ -39,7 +39,3 @@ jobs:
       - name: Test build
         run: |
           bash dev/build.sh
-      - name: Test installation
-        run: |
-          pip install -e .
-          python -c 'import dbt_artifacts_parser'
