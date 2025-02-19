@@ -1,52 +1,93 @@
 import argparse
 import asyncio
+import json
+import textwrap
+from typing import List
 
 from google import genai
 from google.genai import chats, types
 from loguru import logger
+from pydantic import BaseModel, Field
 
 from research_agent.mcp_client import MCPClient
 from research_agent.utils import to_gemini_tool
+
+
+class Reference(BaseModel):
+    """A reference to a document."""
+
+    title: str = Field(..., description="The title of the document.")
+    raw_text: str = Field(..., description="The raw text of the document.")
+
+
+class SearchResponse(BaseModel):
+    """The response from the search tool."""
+
+    answer: str = Field(..., description="The answer to the user's question.")
+    references: List[Reference] = Field(
+        ...,
+        description="The references to the documents that are used to answer the user's question.",
+    )
+
+    @classmethod
+    def from_json_string(cls, json_string: str) -> "SearchResponse":
+        """Deserialize the search response from a JSON string."""
+        return cls(**json.loads(json_string))
+
+    def __str__(self) -> str:
+        return textwrap.dedent(f"""
+Answer: {self.answer}
+
+References:
+{"\n".join([f"  - {ref.title}: {ref.raw_text}" for ref in self.references])}
+""")
 
 
 async def process_query(
     chat_client: chats.Chat,
     mcp_client: MCPClient,
     query: str,
-):
+) -> str:
     """Process the user query using Gemini and MCP tools."""
     response = chat_client.send_message(message=[query])
     if not response.candidates:
         raise RuntimeError("No response from Gemini")
 
-    returned_message = None
+    response_text = []
     for candidate in response.candidates:
-        if candidate.content:
-            for part in candidate.content.parts:
-                # If the candidate is a text, add it to the returned message
-                if part.text:
-                    returned_message = types.Content(
-                        role="model", parts=[types.Part.from_text(text=part.text)]
-                    )
-                # If the candidate is a tool call, call the tool
-                elif part.function_call:
-                    tool_name = part.function_call.name
-                    tool_args = part.function_call.args
-                    logger.debug(f"Tool name: {tool_name}, tool args: {tool_args}")
-                    tool_call = await mcp_client.call_tool(tool_name, tool_args)
-                    if tool_call and tool_call.content:
-                        returned_message = types.Content(
-                            role="model",
-                            parts=[
-                                types.Part.from_text(text=content.text)
-                                for content in tool_call.content
-                            ],
-                        )
-                    else:
-                        raise RuntimeError(f"No tool call content {tool_call}")
+        if not candidate.content:
+            logger.debug(f"No content in candidate {candidate}")
+            continue
+
+        for part in candidate.content.parts:
+            if part.text:
+                response_text.append(part.text)
+            elif part.function_call:
+                tool_name = part.function_call.name
+                tool_args = part.function_call.args
+                logger.debug(f"Tool name: {tool_name}, tool args: {tool_args}")
+                tool_call = await mcp_client.call_tool(tool_name, tool_args)
+
+                if tool_call and tool_call.content:
+                    for content in tool_call.content:
+                        text = content.text
+                        if not text:
+                            logger.info(f"No text in tool call content {content}")
+                            continue
+
+                        try:
+                            parsed_content = SearchResponse.from_json_string(text)
+                            response_text.append(str(parsed_content))
+                        except Exception as e:  # pylint: disable=broad-except
+                            logger.error(
+                                f"Failed to deserialize tool call content {content}: {e}"
+                            )
+                            response_text.append(text)
                 else:
-                    raise RuntimeError(f"Unknown part type {part}")
-    return returned_message
+                    raise RuntimeError(f"No tool call content {tool_call}")
+            else:
+                raise RuntimeError(f"Unknown part type {part}")
+    return "\n".join(response_text)
 
 
 async def chat(server_url: str):
