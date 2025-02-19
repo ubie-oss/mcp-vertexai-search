@@ -6,6 +6,7 @@ This is a MCP server to search documents using Vertex AI.
 
 This solution uses Gemini with Vertex AI grounding to search documents using your private data.
 Grounding improves the quality of search results by grounding Gemini's responses in your data stored in Vertex AI Datastore.
+We can integrate one or multiple Vertex AI data stores to the MCP server.
 For more details on grounding, refer to [Vertex AI Grounding Documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/ground-with-your-data).
 
 ![Architecture](./docs/img//archirecture.png)
@@ -53,3 +54,21 @@ uv run mcp-vertexai-search search \
     --config config.yml \
     --query <your-query>
 ```
+
+## Appendix A: Config file
+
+[config.yml.template](./config.yml.template) is a template for the config file.
+
+- `server`
+  - `server.name`: The name of the MCP server
+- `model`
+  - `model.model_name`: The name of the Vertex AI model
+  - `model.project_id`: The project ID of the Vertex AI model
+  - `model.location`: The location of the model (e.g. us-central1)
+  - `model.generate_content_config`: The configuration for the generate content API
+- `data_stores`: The list of Vertex AI data stores
+  - `data_stores.project_id`: The project ID of the Vertex AI data store
+  - `data_stores.location`: The location of the Vertex AI data store (e.g. us)
+  - `data_stores.datastore_id`: The ID of the Vertex AI data store
+  - `data_stores.tool_name`: The name of the tool
+  - `data_stores.description`: The description of the Vertex AI data store
