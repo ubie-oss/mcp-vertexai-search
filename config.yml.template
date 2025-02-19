@@ -7,6 +7,7 @@ model:
   model_name: models/gemini-1.5-flash-002 # The name of the Vertex AI model
   project_id: <your-project-id> # The project ID of the Vertex AI model
   location: <your-location> # The location of the model (e.g. us-central1)
+  impersonate_service_account: <your-service-account> # The service account to impersonate
   generate_content_config: # The configuration for the generate content API
     temperature: 0.7 # The temperature for the generate content API
     top_p: 0.95 # The top p for the generate content API
