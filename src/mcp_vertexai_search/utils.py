@@ -16,7 +16,10 @@ def to_mcp_tool(tool_name: str, description: str) -> mcp_types.Tool:
             "properties": {
                 "query": {
                     "type": "string",
-                    "description": "The search query",
+                    "description": """\
+                      A natural language question, not search keywords, used to query the documents.
+                      The query question should be sentence(s), not search keywords.
+                      """.strip(),
                 },
             },
         },
