@@ -97,3 +97,16 @@ def search(
         safety_settings=safety_settings,
     )
     print(response)
+
+
+@cli.command("validate-config")
+@click.option("--config", type=click.Path(exists=True), help="The config file")
+@click.option("--verbose", type=bool, default=False, help="Verbose output")
+def validate_config(config: str, verbose: bool):
+    try:
+        server_config = load_yaml_config(config)
+        if verbose:
+            print(server_config.model_dump_json(indent=2))
+    # pylint: disable=broad-exception-caught
+    except Exception as e:
+        raise ValueError(f"Invalid config: {e}") from e
