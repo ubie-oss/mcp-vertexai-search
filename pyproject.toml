@@ -36,6 +36,7 @@ dependencies = [
   "loguru>=0.7.3",
   "mcp>=1.2.1",
   "pydantic>=2.10.6",
+  "pyyaml>=6.0.2",
   "uvicorn>=0.34.0",
   "vertexai>=1.43.0",
 ]

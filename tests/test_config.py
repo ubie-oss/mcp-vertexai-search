@@ -13,7 +13,11 @@ class TestConfig(unittest.TestCase):
     def test_default_config(self):
         """Test that default Config values are set correctly."""
         config = Config(
-            model=VertexAIModelConfig(model_name="test-model", location="test-location"),
+            model=VertexAIModelConfig(
+              project_id="test-project",
+              model_name="test-model",
+              location="test-location",
+            ),
         )
         self.assertIsInstance(config.server, MCPServerConfig)
         self.assertIsInstance(config.model, VertexAIModelConfig)
@@ -23,8 +27,9 @@ class TestConfig(unittest.TestCase):
         """Test that Config can be initialized with custom values."""
         custom_server = MCPServerConfig(name="test-server")
         custom_model = VertexAIModelConfig(
+            project_id="test-project",
             model_name="test-model",
-            location="test-location"
+            location="test-location",
         )
         custom_data_store = DataStoreConfig(
             project_id="test-project",
@@ -58,10 +63,14 @@ class TestConfig(unittest.TestCase):
     def test_default_vertexaimodelconfig(self):
         """Test VertexAIModelConfig default values."""
         model_config = VertexAIModelConfig(
+            project_id="test-project",
+            location="test-location",
             model_name="test-model",
-            location="test-location"
         )
         self.assertIsInstance(model_config.generate_content_config, GenerateContentConfig)
+        self.assertEqual(model_config.project_id, "test-project")
+        self.assertEqual(model_config.location, "test-location")
+        self.assertEqual(model_config.model_name, "test-model")
         self.assertEqual(model_config.generate_content_config.temperature, 0.7)
         self.assertEqual(model_config.generate_content_config.top_p, 0.95)
 

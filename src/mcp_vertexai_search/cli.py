@@ -12,6 +12,7 @@ from mcp_vertexai_search.agent import (
     get_system_instruction,
 )
 from mcp_vertexai_search.config import load_yaml_config
+from mcp_vertexai_search.google_cloud import get_credentials
 from mcp_vertexai_search.server import create_server, run_sse_server, run_stdio_server
 
 cli = click.Group()
@@ -67,8 +68,13 @@ def search(
     server_config = load_yaml_config(config)
 
     # Initialize the Vertex AI client
+    credentials = get_credentials(
+        impersonate_service_account=server_config.model.impersonate_service_account,
+    )
     vertexai.init(
-        project=server_config.model.project_id, location=server_config.model.location
+        project=server_config.model.project_id,
+        location=server_config.model.location,
+        credentials=credentials,
     )
 
     # Create the search agent

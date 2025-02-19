@@ -21,10 +21,11 @@ class VertexAIModelConfig(BaseModel):
     """The configuration for a Vertex AI model."""
 
     model_name: str = Field(..., description="The name of the Vertex AI model")
-    project_id: Optional[str] = Field(
-        None, description="The project ID of the Vertex AI model"
-    )
+    project_id: str = Field(..., description="The project ID of the Vertex AI model")
     location: str = Field(..., description="The location of the model")
+    impersonate_service_account: Optional[str] = Field(
+        None, description="The service account to impersonate"
+    )
     generate_content_config: Optional[GenerateContentConfig] = Field(
         description="The configuration for the generate content API",
         default_factory=GenerateContentConfig,

@@ -65,6 +65,7 @@ uv run mcp-vertexai-search search \
   - `model.model_name`: The name of the Vertex AI model
   - `model.project_id`: The project ID of the Vertex AI model
   - `model.location`: The location of the model (e.g. us-central1)
+  - `model.impersonate_service_account`: The service account to impersonate
   - `model.generate_content_config`: The configuration for the generate content API
 - `data_stores`: The list of Vertex AI data stores
   - `data_stores.project_id`: The project ID of the Vertex AI data store
