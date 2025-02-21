@@ -13,14 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 import asyncio
 import os
 import sys
+import textwrap
 import traceback
+from typing import Optional
 
 import pyaudio
 import streamlit as st
 from google import genai
+from google.genai import types
+from google.genai.live import AsyncSession
+from loguru import logger
+
+from research_agent.mcp_client import MCPClient
+from research_agent.utils import to_gemini_function_declarations
 
 if sys.version_info < (3, 11, 0):
     import exceptiongroup
@@ -43,18 +52,61 @@ client = genai.Client(
 
 # While Gemini 2.0 Flash is in experimental preview mode, only one of AUDIO or
 # TEXT may be passed here.
-CONFIG = {"generation_config": {"response_modalities": ["TEXT"]}}
+# CONFIG = {"generation_config": {"response_modalities": ["TEXT"]}}
 
 pya = pyaudio.PyAudio()
 
 
 class AudioLoop:
-    def __init__(self):
+    def __init__(self, mcp_server_url: Optional[str] = None):
         self.out_queue = None
-        self.session = None
+        self.session: AsyncSession = None
         self.audio_stream = None  # Initialize audio_stream to None
         self.receive_text_task = None
         self.send_realtime_task = None
+        self.mcp_server_url = mcp_server_url
+        self.mcp_client: Optional[MCPClient] = None
+        self.config = None
+
+    async def get_config(self):
+        """Get the config for the session"""
+        if self.config is None:
+            # Connect to MCP server
+            if self.mcp_server_url is not None:
+                self.mcp_client = MCPClient(name="document_search")
+                await self.mcp_client.connect_to_server(self.mcp_server_url)
+
+            function_declarations = []
+            if self.mcp_client is not None:
+                logger.debug("Getting MCP tools")
+                mcp_response = await self.mcp_client.list_tools()
+                logger.debug(f"MCP tools: {mcp_response}")
+                function_declarations = [
+                    # to_gemini_function_declarations(t).model_dump(
+                    #     exclude_none=True, exclude_unset=True
+                    # )
+                    to_gemini_function_declarations(t)
+                    for t in mcp_response.tools
+                ]
+            self.config = {
+                "generation_config": {
+                    "response_modalities": ["TEXT"],
+                    # "tools": genai_tools,
+                },
+                "tools": [
+                    {"function_declarations": function_declarations},
+                    # {"code_execution": None},
+                ],
+                "system_instruction": textwrap.dedent("""\
+                    You are a helpful assistant that can answer questions by searching the documents.
+                    You have to use the tools provided to you to answer the questions.
+                    You can't use the code execution feature.
+                    """),
+            }
+            logger.debug(f"Config: {self.config}")
+            # if mcp_client:
+            #     await mcp_client.cleanup()
+        return self.config
 
     async def send_realtime(self):
         while True:
@@ -85,15 +137,44 @@ class AudioLoop:
         full_text = ""
         turn = self.session.receive()
         async for response in turn:
+            logger.debug(f"Response: {response}")
+            if response.tool_call:
+                try:
+                    await self.handle_tool_call(self.session, response.tool_call)
+                except Exception as e:
+                    logger.error(f"Error handling tool call: {e}")
             if text := response.text:
                 full_text += text
                 message_placeholder.markdown(full_text + "▌")  # Add a cursor effect
         message_placeholder.markdown(full_text)  # Final response without cursor
 
+    async def handle_tool_call(self, session, tool_call: types.LiveServerToolCall):
+        """Handle tool calls from the assistant"""
+        # mcp_client = MCPClient(name="document-search")
+        # await mcp_client.connect_to_server(self.mcp_server_url)
+
+        for fc in tool_call.function_calls:
+            logger.debug(f"Tool call: {fc}")
+            tool_response = types.LiveClientToolResponse(
+                function_responses=[
+                    types.FunctionResponse(
+                        name=fc.name,
+                        id=fc.id,
+                        response={
+                            "result": await self.mcp_client.call_tool(fc.name, fc.args)
+                        },
+                    )
+                ]
+            )
+        # await mcp_client.cleanup()
+        await session.send(input=tool_response)
+
     async def run(self, message_placeholder):
         try:
+            config = await self.get_config()
+            logger.debug(f"Config: {config}")
             async with (
-                client.aio.live.connect(model=MODEL, config=CONFIG) as session,
+                client.aio.live.connect(model=MODEL, config=config) as session,
                 asyncio.TaskGroup() as tg,
             ):
                 self.session = session
@@ -114,6 +195,11 @@ class AudioLoop:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mcp-server-url", type=str, default=None, required=False)
+    parsed_args = parser.parse_args()
+    mcp_server_url = parsed_args.mcp_server_url
+
     st.title("Voice Chat with Gemini")
 
     if "messages" not in st.session_state:
@@ -123,9 +209,11 @@ if __name__ == "__main__":
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    if st.button("Start Voice Chat"):
-        audio_loop = AudioLoop()
-        message_placeholder = st.empty()  # Placeholder for streaming response
+    voice_chat_on = st.checkbox("Voice Chat")
+
+    if voice_chat_on:
+        audio_loop = AudioLoop(mcp_server_url=mcp_server_url)
+        st.empty()  # Placeholder for streaming response
         with st.chat_message("user"):
             st.markdown("Listening...")
             user_msg_placeholder = st.empty()
@@ -138,14 +226,16 @@ if __name__ == "__main__":
             current_assistant_message = st.session_state.messages[-1]
 
             async def process_audio():
-                await audio_loop.run(
-                    assistant_msg_placeholder
-                )  # Pass placeholder to run
-                user_msg_placeholder.markdown(
-                    "You: (voice input)"
-                )  # Indicate voice input finished
-                current_assistant_message["content"] = (
-                    assistant_msg_placeholder._arrow_delta_text_proto.delta.markdown
-                )  # Capture final response
+                while voice_chat_on:
+                    await audio_loop.run(
+                        assistant_msg_placeholder
+                    )  # Pass placeholder to run
+                    user_msg_placeholder.markdown(
+                        "You: (voice input)"
+                    )  # Indicate voice input finished
+                    current_assistant_message["content"] = (
+                        assistant_msg_placeholder.markdown
+                    )  # Capture final response
+                    # break # remove after implementing stop mechanism
 
             asyncio.run(process_audio())
