@@ -49,8 +49,10 @@ dev = [
   "google-genai>=1.2.0",
   "isort>=6.0.0",
   "langgraph>=0.2.74",
+  "pyaudio>=0.2.14",
   "pytest>=8.3.4",
   "ruff>=0.9.6",
+  "streamlit>=1.42.2",
 ]
 
 
