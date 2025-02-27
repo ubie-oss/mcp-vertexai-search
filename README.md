@@ -11,6 +11,40 @@ For more details on grounding, refer to [Vertex AI Grounding Documentation](http
 
 ![Architecture](./docs/img//archirecture.png)
 
+## How to use
+
+There are two ways to use this MCP server.
+If you want to run this on Docker, the first approach would be good as Dockerfile is provided in the project.
+
+### 1. Clone the repository
+
+```shell
+# Clone the repository
+git clone git@github.com:ubie-oss/mcp-vertexai-search.git
+
+# Create a virtual environment
+uv venv
+# Install the dependencies
+uv sync --all-extras
+
+# Check the command
+uv run mcp-vertexai-search
+```
+
+### Install the python package
+
+The package isn't published to PyPI yet, but we can install it from the repository.
+We need a config file derives from [config.yml.template](./config.yml.template) to run the MCP server, because the python package doesn't include the config template.
+Please refer to [Appendix A: Config file](#appendix-a-config-file) for the details of the config file.
+
+```shell
+# Install the package
+pip install git+https://github.com/ubie-oss/mcp-vertexai-search.git
+
+# Check the command
+mcp-vertexai-search --help
+```
+
 ## Development
 
 ### Prerequisites
