@@ -20,23 +20,23 @@ lint:
   disabled:
     - black
   enabled:
-    - semgrep@1.109.0
+    - semgrep@1.110.0
     - pre-commit-hooks@5.0.0
     - trivy@0.59.1
     - osv-scanner@1.9.2
     - actionlint@1.7.7
     - bandit@1.8.3
-    - checkov@3.2.374
-    - isort@6.0.0
-    - ruff@0.9.7
+    - checkov@3.2.379
+    - isort@6.0.1
+    - ruff@0.9.9
     - shellcheck@0.10.0
     - shfmt@3.6.0
     - taplo@0.9.3
     - yamllint@1.35.1
     - git-diff-check
     - markdownlint@0.44.0
-    - prettier@3.5.2
-    - trufflehog@3.88.12
+    - prettier@3.5.3
+    - trufflehog@3.88.14
 actions:
   enabled:
     - trunk-announce
