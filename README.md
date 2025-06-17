@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/ubie-oss-mcp-vertexai-search-badge.png)](https://mseep.ai/app/ubie-oss-mcp-vertexai-search)
+
 # MCP Server for Vertex AI Search
 
 This is a MCP server to search documents using Vertex AI.
