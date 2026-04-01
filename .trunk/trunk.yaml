@@ -22,7 +22,7 @@ lint:
   enabled:
     - semgrep@1.157.0
     - pre-commit-hooks@5.0.0
-    - trivy@0.63.0
+    - trivy@0.69.3
     - osv-scanner@2.0.2
     - actionlint@1.7.7
     - bandit@1.8.3
