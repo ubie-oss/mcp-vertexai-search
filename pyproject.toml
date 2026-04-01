@@ -30,27 +30,27 @@ classifiers = [
 ]
 description = "A dbt artifacts parser in python"
 dependencies = [
-  "click>=8.1.8",
-  "google-cloud-aiplatform>=1.96.0",
-  "google-cloud-discoveryengine>=0.13.8",
+  "click>=8.3.1",
+  "google-cloud-aiplatform>=1.144.0",
+  "google-cloud-discoveryengine>=0.18.0",
   "loguru>=0.7.3",
-  "mcp[cli]>=1.9.2",
-  "pydantic>=2.10.6",
-  "pyyaml>=6.0.2",
-  "uvicorn>=0.34.0",
+  "mcp[cli]>=1.26.0",
+  "pydantic>=2.12.5",
+  "pyyaml>=6.0.3",
+  "uvicorn>=0.42.0",
   "vertexai>=1.43.0",
 ]
 
 [project.optional-dependencies]
 dev = [
   "autopep8>=2.3.2",
-  "bandit>=1.8.3",
-  "black>=25.1.0",
-  "google-genai>=1.2.0",
-  "isort>=6.0.0",
-  "langgraph>=0.2.74",
-  "pytest>=8.3.4",
-  "ruff>=0.9.6",
+  "bandit>=1.9.4",
+  "black>=26.3.1",
+  "google-genai>=1.69.0",
+  "isort>=8.0.1",
+  "langgraph>=1.1.4",
+  "pytest>=9.0.2",
+  "ruff>=0.15.8",
 ]
 
 
