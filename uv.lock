@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10.0"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -703,7 +703,7 @@ name = "langgraph-checkpoint"
 version = "2.0.26"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "langchain-core", marker = "python_full_version < '4.0'" },
+    { name = "langchain-core", marker = "python_full_version < '4'" },
     { name = "ormsgpack" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c5/61/e2518ac9216a4e9f4efda3ac61595e3c9e9ac00833141c9688e8d56bd7eb/langgraph_checkpoint-2.0.26.tar.gz", hash = "sha256:2b800195532d5efb079db9754f037281225ae175f7a395523f4bf41223cbc9d6", size = 37874, upload-time = "2025-05-15T17:31:22.466Z" }
@@ -840,13 +840,13 @@ requires-dist = [
     { name = "bandit", marker = "extra == 'dev'", specifier = ">=1.8.3" },
     { name = "black", marker = "extra == 'dev'", specifier = ">=25.1.0" },
     { name = "click", specifier = ">=8.1.8" },
-    { name = "google-cloud-aiplatform", specifier = ">=1.80.0" },
-    { name = "google-cloud-discoveryengine", specifier = ">=0.13.6" },
+    { name = "google-cloud-aiplatform", specifier = ">=1.96.0" },
+    { name = "google-cloud-discoveryengine", specifier = ">=0.13.8" },
     { name = "google-genai", marker = "extra == 'dev'", specifier = ">=1.2.0" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=6.0.0" },
     { name = "langgraph", marker = "extra == 'dev'", specifier = ">=0.2.74" },
     { name = "loguru", specifier = ">=0.7.3" },
-    { name = "mcp", extras = ["cli"], specifier = ">=1.2.1" },
+    { name = "mcp", extras = ["cli"], specifier = ">=1.9.2" },
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.4" },
     { name = "pyyaml", specifier = ">=6.0.2" },
