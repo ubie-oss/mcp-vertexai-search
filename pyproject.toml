@@ -31,10 +31,10 @@ classifiers = [
 description = "A dbt artifacts parser in python"
 dependencies = [
   "click>=8.1.8",
-  "google-cloud-aiplatform>=1.96.0",
+  "google-cloud-aiplatform>=1.133.0",
   "google-cloud-discoveryengine>=0.13.8",
   "loguru>=0.7.3",
-  "mcp[cli]>=1.9.2",
+  "mcp[cli]>=1.23.0",
   "pydantic>=2.10.6",
   "pyyaml>=6.0.2",
   "uvicorn>=0.34.0",
@@ -56,3 +56,14 @@ dev = [
 
 [project.scripts]
 mcp-vertexai-search = "mcp_vertexai_search.cli:cli"
+
+[tool.uv]
+constraint-dependencies = [
+  "protobuf>=6.33.5",
+  "pyasn1>=0.6.3",
+  "pygments>=2.20.0",
+  "python-multipart>=0.0.26",
+  "requests>=2.33.0",
+  "starlette>=0.49.1",
+  "urllib3>=2.6.3",
+]
