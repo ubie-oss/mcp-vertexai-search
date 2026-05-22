@@ -17,10 +17,10 @@ jobs:
       pull-requests: write # For trunk to create PRs
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
       # >>> Install your own deps here (npm install, etc) <<<
       # SEE https://github.com/trunk-io/trunk-action
       - name: Trunk Upgrade
-        uses: trunk-io/trunk-action/upgrade@v1
+        uses: trunk-io/trunk-action/upgrade@75699af9e26881e564e9d832ef7dc3af25ec031b # ratchet:trunk-io/trunk-action/upgrade@v1
         with:
           signoff: true
