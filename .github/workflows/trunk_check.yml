@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
 
       - name: Trunk Check
-        uses: trunk-io/trunk-action@v1
+        uses: trunk-io/trunk-action@75699af9e26881e564e9d832ef7dc3af25ec031b # ratchet:trunk-io/trunk-action@v1
