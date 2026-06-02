@@ -7,7 +7,7 @@ cli:
 plugins:
   sources:
     - id: trunk
-      ref: v1.8.0
+      ref: v1.10.0
       uri: https://github.com/trunk-io/plugins
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
 runtimes:
@@ -20,15 +20,15 @@ lint:
   disabled:
     - black
   enabled:
-    - semgrep@1.161.0
+    - semgrep@1.164.0
     - pre-commit-hooks@5.0.0
     - trivy@0.70.0
-    - osv-scanner@2.3.5
+    - osv-scanner@2.3.8
     - actionlint@1.7.12
     - bandit@1.9.4
-    - checkov@3.2.526
+    - checkov@3.2.530
     - isort@8.0.1
-    - ruff@0.15.12
+    - ruff@0.15.15
     - shellcheck@0.11.0
     - shfmt@3.6.0
     - taplo@0.10.0
@@ -36,7 +36,7 @@ lint:
     - git-diff-check
     - markdownlint@0.48.0
     - prettier@3.8.3
-    - trufflehog@3.95.2
+    - trufflehog@3.95.3
 actions:
   enabled:
     - trunk-announce
