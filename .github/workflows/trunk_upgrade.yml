@@ -21,6 +21,6 @@ jobs:
       # >>> Install your own deps here (npm install, etc) <<<
       # SEE https://github.com/trunk-io/trunk-action
       - name: Trunk Upgrade
-        uses: trunk-io/trunk-action/upgrade@04ba50e7658c81db7356da96657e6e77f220bfa3 # ratchet:trunk-io/trunk-action/upgrade@v1.3.1
+        uses: trunk-io/trunk-action/upgrade@e1234e67a86010d61ddac8d8ebf4b783e2ffd2fa # ratchet:trunk-io/trunk-action/upgrade@v2.0.0
         with:
           signoff: true
